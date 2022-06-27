@@ -1,25 +1,50 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import AlertMessage from './components/AlertMessage';
+import Nav from './components/Nav';
+import CreatePost from './views/CreatePost';
+import Home from './views/Home';
+import Login from './views/Login';
+import Register from './views/Register';
+import SinglePost from './views/SinglePost';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+function App(props) {
+    const [message, setMessage] = useState(null);
+    const [category, setCategory] = useState(null);
+    const [loggedIn, setLoggedIn] = useState(localStorage.getItem('token') ? true : false)
+
+    const flashMessage = (message, category) => {
+        setMessage(message);
+        setCategory(category);
+    }
+
+    const login = () => {
+        setLoggedIn(true)
+    }
+
+    const logout = () => {
+        localStorage.clear()
+        setLoggedIn(false)
+    }
+
+    return (
+        <div id="fromApp">
+            <Nav brand="BlogApp" loggedIn={loggedIn} logout={logout}/>
+            <div className='container'>
+                {message ? <AlertMessage message={message} category={category} flashMessage={flashMessage} /> : null}
+                
+                <Routes>
+                    <Route path='/' element={<Home />} />
+                    <Route path='/register' element={<Register flashMessage={flashMessage} />} />
+                    <Route path='/login' element={<Login flashMessage={flashMessage} login={login} />} />
+                    <Route path='/create-post' element={<CreatePost flashMessage={flashMessage} loggedIn={loggedIn} />} />
+                    <Route path='/posts/:postId' element={<SinglePost />} />
+                </Routes>
+            </div>
+        </div>
+    );
 }
+
 
 export default App;
